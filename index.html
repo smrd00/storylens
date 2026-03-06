@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>StoryLens</title>
+
+<link rel="stylesheet" href="style.css">
+
+<!-- PDF.js -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.min.js"></script>
+
+<!-- JSZip (required for EPUB) -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+
+<!-- EPUB.js -->
+<script src="https://unpkg.com/epubjs/dist/epub.min.js"></script>
+</head>
+
+<body>
+
+<h1>StoryLens</h1>
+
+<div id="uploadScreen">
+  <input type="file" id="fileUpload" accept=".pdf,.epub">
+  <button id="openBtn">Open Book</button>
+</div>
+
+<div id="reader" style="display:none;">
+
+  <!-- Top bar: save + settings -->
+  <div class="top-bar">
+    <button id="savePageBtn" title="Save current position">🔖 Save Page</button>
+    <button id="settingsBtn" title="Settings">⚙️ Settings</button>
+  </div>
+
+  <canvas id="pdfCanvas" style="display:none;"></canvas>
+  <div id="epubViewer" style="display:none;"></div>
+
+  <!-- Navigation below reader -->
+  <div class="navigation">
+    <button id="prevBtn">◀ Prev</button>
+    <span id="pageInfo">0% read</span>
+    <button id="nextBtn">Next ▶</button>
+  </div>
+
+</div>
+
+<!-- Settings / sidebar popup -->
+<div id="settingsPopup">
+  <div id="settingsContent">
+    <!-- Left sidebar: chapters + characters -->
+    <div id="settingsSidebar">
+      <div id="chapterPanel" style="display:none;">
+        <h3>Chapters</h3>
+        <div id="chapterList"></div>
+      </div>
+      <div id="characterPanel">
+        <h3>Characters</h3>
+        <div id="characterList"></div>
+      </div>
+    </div>
+
+    <!-- Right panel: settings controls -->
+    <div id="settingsControls">
+      <button id="settingsClose" title="Close">✕</button>
+      <h2>Settings</h2>
+
+      <section>
+        <h3>Font</h3>
+        <button id="fontToggleBtn">Switch to OpenDyslexic</button>
+      </section>
+
+      <section>
+        <h3>Text Size</h3>
+        <input type="range" id="fontSizeSlider" min="80" max="200" value="100" step="5">
+        <span id="fontSizeValue">100%</span>
+      </section>
+
+      <section>
+        <h3>Character Color</h3>
+        <p style="font-size:0.85em;color:#777;margin:0 0 8px;">Click a character name in the text, or select one from the list on the left.</p>
+        <input type="color" id="colorPicker" value="#ff0000">
+        <button id="saveColor">Apply Color</button>
+      </section>
+
+    </div>
+  </div>
+</div>
+
+<!-- Inline color picker popup (shown when clicking a name in text) -->
+<div id="inlineColorPicker">
+  <strong id="inlineCharName"></strong>
+  <br><br>
+  <input type="color" id="inlineColor" value="#ff0000">
+  <div id="styleOptions">
+    <label><input type="radio" name="inlineStyle" value="underline"> Dashed underline</label>
+    <label><input type="radio" name="inlineStyle" value="solid"> Full color</label>
+    <label><input type="radio" name="inlineStyle" value="ombre"> Ombre</label>
+  </div>
+  <br>
+  <button id="inlineApply">Apply</button>
+  <button id="inlineClose">Cancel</button>
+</div>
+
+<script src="app.js"></script>
+
+</body>
+</html>
