@@ -484,28 +484,69 @@ window.addEventListener("resize", function() {
 });
 
 // ============================================================
-//  SWIPE NAVIGATION (touch devices)
+//  SWIPE NAVIGATION & TAP TO TOGGLE (touch devices)
 // ============================================================
 (function() {
   let touchStartX = 0;
   let touchStartY = 0;
+  let tapTimeout = null;
+  let hasSwiped = false;
+  
   const readingArea = document.getElementById("readingArea");
+  const topBar = document.getElementById("topBar");
+  const bottomBar = document.getElementById("bottomBar");
+  const isMobile = window.innerWidth <= 680;
 
   readingArea.addEventListener("touchstart", function(e) {
     touchStartX = e.changedTouches[0].clientX;
     touchStartY = e.changedTouches[0].clientY;
+    hasSwiped = false;
+    clearTimeout(tapTimeout);
+  }, { passive: true });
+
+  readingArea.addEventListener("touchmove", function(e) {
+    const dx = Math.abs(e.changedTouches[0].clientX - touchStartX);
+    const dy = Math.abs(e.changedTouches[0].clientY - touchStartY);
+    if (dx > 30 || dy > 30) {
+      hasSwiped = true;
+      clearTimeout(tapTimeout);
+    }
   }, { passive: true });
 
   readingArea.addEventListener("touchend", function(e) {
     const dx = e.changedTouches[0].clientX - touchStartX;
     const dy = e.changedTouches[0].clientY - touchStartY;
-    // Only trigger if horizontal swipe dominates and is long enough
+    
+    // Horizontal swipe for page navigation
     if (Math.abs(dx) > 50 && Math.abs(dx) > Math.abs(dy) * 1.5) {
       if (dx < 0) {
         nextPage(); // swipe left → next
       } else {
         prevPage(); // swipe right → prev
       }
+      return;
+    }
+    
+    // Mobile: tap to toggle fullscreen bars
+    if (isMobile && !hasSwiped && Math.abs(dx) < 10 && Math.abs(dy) < 10) {
+      tapTimeout = setTimeout(function() {
+        const topBarHidden = topBar.classList.contains("hidden");
+        const bottomBarHidden = bottomBar.classList.contains("hidden");
+        
+        if (topBarHidden && bottomBarHidden) {
+          // Show both bars
+          topBar.classList.remove("hidden");
+          bottomBar.classList.remove("hidden");
+        } else if (!topBarHidden && !bottomBarHidden) {
+          // Hide both bars for fullscreen
+          topBar.classList.add("hidden");
+          bottomBar.classList.add("hidden");
+        } else {
+          // Sync state - show both
+          topBar.classList.remove("hidden");
+          bottomBar.classList.remove("hidden");
+        }
+      }, 150);
     }
   }, { passive: true });
 })();
@@ -519,6 +560,8 @@ document.addEventListener("keydown", function(e) {
   if (e.key === "ArrowRight" || e.key === "ArrowDown") nextPage();
   if (e.key === "ArrowLeft"  || e.key === "ArrowUp")   prevPage();
 });
+
+
 
 // ============================================================
 //  SETTINGS PANEL
